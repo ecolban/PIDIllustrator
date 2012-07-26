@@ -30,10 +30,6 @@ public class Robot
      */
     private static final float TURN_TOLERANCE = 0.001F;
     /*
-     * Number of iterations before starting to average the error
-     */
-    private static final int TRAINING_STEPS = 50;
-    /*
      * The maximum speed above or below the average speed of the two wheels
      */
     private static final float MAX_STEERING = 20F;
@@ -100,23 +96,21 @@ public class Robot
      * @return the average error, which may be used to optimize the
      * coefficients.
      */
-    public float run(float kProp, float kInt, float kDiff)
+    public void run(float kProp, float kInt, float kDiff)
     {
         path.reset();
         path.moveTo(xPosInit, yPosInit);
         xPos = xPosInit;
         yPos = yPosInit;
         heading = headingInit;
-        float meanErrorSq = 0F;
 
         float steering = 0F;
-        float crosstrackError = readSensors();
-        float cteDiff;
+        float crosstrackError;
+        float previousCte = readSensors();
+        float cteDiff ;
         float cteInt = 0;
-        int iterations = 0;
         int totalTime = 0;
         while (xPos < LANE_LENGTH && abs(yPos) < LANE_WIDTH / 2) {
-            iterations++;
             // Cap the steering within the limits:
             steering = max(-MAX_STEERING, min(steering, MAX_STEERING));
 
@@ -124,21 +118,14 @@ public class Robot
             int rightSpeed = round(min(MAX_SPEED, MAX_SPEED + 2 * steering));
             int deltaTime = 100 + random.nextInt(timingNoise); // in ms
             driveDirect(leftSpeed, rightSpeed, deltaTime);
-//            trace.add(new Point((int) xPos, (int) yPos));
-            cteDiff = crosstrackError; // placeholder for last cte
-            crosstrackError = 0.8F * readSensors() + 0.2F * crosstrackError; // exp. avg.
-            cteDiff = (crosstrackError - cteDiff) / deltaTime;
+            crosstrackError = 0.8F * readSensors() + 0.2F * previousCte; // exp. avg.
+            cteDiff = (crosstrackError - previousCte) / deltaTime;
             cteInt += crosstrackError * deltaTime;
             steering = -kProp * crosstrackError - kDiff * cteDiff - kInt * cteInt;
-            if (iterations > TRAINING_STEPS) {
-                meanErrorSq += crosstrackError * crosstrackError;
-            }
             totalTime += deltaTime;
+            previousCte = crosstrackError;
         }
         System.out.println("time = " + totalTime);
-        return xPos >= LANE_LENGTH // Did the robot make it to the end?
-                ? meanErrorSq / iterations
-                : Float.POSITIVE_INFINITY;
 
     }
 

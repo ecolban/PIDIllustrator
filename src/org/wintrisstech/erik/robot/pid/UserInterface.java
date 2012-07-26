@@ -56,7 +56,7 @@ public class UserInterface extends JPanel
         JFrame frame = new JFrame("PID Illustrator");
         frame.setLayout(new BorderLayout());
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        double w = dim.getWidth() - 16; // subtract the border width
+        double w = dim.getWidth(); // subtract the border width
         dim.setSize(w, w * Robot.LANE_WIDTH / Robot.LANE_LENGTH);
         setPreferredSize(dim);
         frame.add(this, BorderLayout.CENTER);
@@ -165,32 +165,8 @@ public class UserInterface extends JPanel
          * Run button
          */
         JButton runButton = new JButton("Run");
-        runButton.addActionListener(new ActionListener()
-        {
-
-            @Override
-            public void actionPerformed(ActionEvent ae)
-            {
-
-                runRoomba();
-            }
-        });
+        runButton.addActionListener(this);
         controlPanel.add(runButton);
-//        /*
-//         * Twiddle button
-//         */
-//        JButton twiddleButton = new JButton("Twiddle");
-//        twiddleButton.addActionListener(new ActionListener()
-//        {
-//
-//            @Override
-//            public void actionPerformed(ActionEvent ae)
-//            {
-//
-//                twiddle();
-//            }
-//        });
-//        controlPanel.add(twiddleButton);
         frame.add(controlPanel, BorderLayout.SOUTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
@@ -215,58 +191,8 @@ public class UserInterface extends JPanel
         robot.paintSelf(g2);
     }
 
-    private double runRoomba()
-    {
-        double error = robot.run(coeffProportional, coeffIntegral, coeffDifferential);
-        repaint();
-        return error;
-    }
+    
 
-//    /**
-//     * Searches for good values for the coefficients
-//     */
-//    private void twiddle()
-//    {
-//        float[] param = {coeffProportional, coeffIntegral, coeffDifferential};
-//        float[] dp = {1F, 1F, 1F};
-//        float minError = robot.run(param[0], param[1], param[2]);
-//        float error;
-//        float sumDp = 0F;
-//        for (int i = 0; i < dp.length; i++) {
-//            sumDp += dp[i];
-//        }
-//        while (sumDp > 0.01) {
-//            for (int i = 0; i < param.length; i++) {
-//                param[i] += dp[i];
-//                error = robot.run(param[0], param[1], param[2]);
-//                if (error < minError) {
-//                    dp[i] *= 1.1F;
-//                    minError = error;
-//                } else {
-//                    param[i] -= 2F * dp[i];
-//                    error = robot.run(param[0], param[1], param[2]);
-//                    if (error < minError) {
-//                        dp[i] *= 1.1F;
-//                        minError = error;
-//                    } else {
-//                        param[i] += dp[i];
-//                        dp[i] *= 0.9F;
-//                    }
-//                }
-//            }
-//            sumDp = 0F;
-//            for (int i = 0; i < dp.length; i++) {
-//                sumDp += dp[i];
-//            }
-//        }
-//        coeffProportional = param[0];
-//        coeffProportionalField.setValue(Math.round(coeffProportional * 10000) / 10000F);
-//        coeffIntegral = param[1];
-//        coeffIntegralField.setValue(Math.round(coeffIntegral * 10000) / 10000F);
-//        coeffDifferential = param[2];
-//        coeffDifferentialField.setValue(Math.round(coeffDifferential * 10000) / 10000F);
-//        runRoomba();
-//    }
 
     @Override
     public void propertyChange(PropertyChangeEvent pce)
@@ -287,6 +213,7 @@ public class UserInterface extends JPanel
     @Override
     public void actionPerformed(ActionEvent ae)
     {
-        runRoomba();
+        robot.run(coeffProportional, coeffIntegral, coeffDifferential);
+        repaint();
     }
 }
