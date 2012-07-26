@@ -1,1 +1,50 @@
-An application that illustrates the use of a PID controller to steer a robot along a straight line.
+An application that illustrates the use of a PID controller to steer a robot 
+along a straight line.
+
+The robot has two driving wheels and a castor wheel for balance. Steering is 
+performed by setting the speed of the right wheel different from the speed of
+the left wheel. If the speed of the left wheel is higher than the speed of the
+right wheel, the robot will turn right.
+
+Assume that:
+
+ - the speed of the left wheel is: speed - steering
+ - the speed of the right wheel is: speed + steering
+ - the turn radius is: radius
+ - the turn angle is: alpha (in radians)
+ - the half distance between the two wheels is: d
+ - the length of the time interval that the robot moves at given speed and 
+   steering is: deltaTime
+
+then the distance traveled by the right wheel is: (speed + steering) * deltaTime
+and the distance traveled  by the left wheel is: (speed - steering) * deltaTime
+
+Each wheel moves in an arc (or straight line if steering == 0) and the length of
+these arcs are (radius + d) * alpha, for the right wheel, and 
+(radius - d) * alpha, for the left wheel. Note that if steering < 0, then 
+alpha < 0 and radius < 0 (i.e., the turn radius is negative if the robot is 
+turning right). Putting all together:
+
+   (radius + d) * alpha = (speed + steering) * deltaTime
+   (radius - d) * alpha = (speed - steering) * deltaTime
+
+These two equations lets us calculate radius and alpha for given speed and 
+steering, and update the robot's pose. See the driveDirect() method of the class
+Robot for details.
+
+The run() method of class Robot calculates speed and steering based on a PID
+controller. In fact, steering is calculated based on the PID controller and
+speed is set to the maximum value that keeps the speed of both wheels below a
+given maximum speed.
+
+It is assumed that the robot can estimate its cross track error within some 
+noise limits. For instance, the robot may use distance sensors and measure the
+distance to a wall that is parallel to the straight line that the robot is 
+trying to follow.
+
+The user interface (GUI) is specified by the class UserInterface. The user 
+interface has a number of fields to set the noise levels, drift, and the PID
+coefficient values. The user can play with this application and hopefully build
+some intuition on how the PID controller works. 
+
+
