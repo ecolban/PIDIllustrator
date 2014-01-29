@@ -32,7 +32,7 @@ public class Robot
     /*
      * The maximum speed above or below the average speed of the two wheels
      */
-    private static final float MAX_STEERING = 20F;
+    private static final float MAX_STEERING = 50F;
     private final Random random = new Random();
     private JPanel panel;
     private Path2D path = new Path2D.Float();
@@ -70,7 +70,7 @@ public class Robot
         // Update position
         double distance = speed * deltaTime; // in mm
         double turn = steering * deltaTime / HALF_WHEEL_DISTANCE;
-        if (abs(turn) < TURN_TOLERANCE) { // if going straignt
+        if (abs(turn) < TURN_TOLERANCE) { // if going straight
             xPos += distance * cos(heading);
             yPos += distance * sin(heading);
             heading += turn;
